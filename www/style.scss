@@ -1,0 +1,40 @@
+.domain {
+  stroke: transparent;
+}
+.tick > line {
+  opacity: 0.2;
+}
+.tick > text {
+  font-family: Verdana;
+  font-size: 12px;
+}
+.axis-y > .tick > text {
+  transform: translateX(-10px);
+}
+
+.point {
+  fill: steelblue;
+  opacity: 0.7;
+}
+
+/* card style */
+.container-fluid {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  h2 {
+    margin: 40px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 0.1px solid lightgray;
+    box-shadow: 5px 5px 5px lightgray;
+    width: min-content;
+    padding: 30px;
+  }  
+}
