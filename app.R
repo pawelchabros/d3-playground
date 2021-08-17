@@ -3,8 +3,8 @@ library(glue)
 library(purrr)
 library(sass)
 
-svg_width <- 700
-svg_height <- 400
+svg_width <- 600
+svg_height <- 350
 margin <- list(
   top = 30,
   right = 10,
@@ -40,16 +40,25 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  render_d3_plot <- function() {
+  render_d3_plot <- function(data, x, y) {
+    get_domain <- function(values) {
+      if (class(values) == "numeric") {
+        return(range(values))
+      } else if (class(values) == "character") {
+        return(unique(values))
+      }
+    }
     session$sendCustomMessage("render_d3_plot", list(
-      data = transpose(mtcars),
+      data = transpose(data),
+      x = x,
+      y = y,
       plotWidth = plot_width,
       plotHeight = plot_height,
-      domainX = range(mtcars$disp),
-      domainY = range(mtcars$hp)
+      domainX = get_domain(data[, x]),
+      domainY = get_domain(data[, y])
     ))
   }
-  render_d3_plot()
+  render_d3_plot(mtcars, "disp", "hp")
 }
 
 shinyApp(ui, server)

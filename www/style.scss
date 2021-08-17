@@ -8,13 +8,11 @@
   font-family: Verdana;
   font-size: 12px;
 }
+.axis-x > .tick > text {
+  transform: translateY(10px);
+}
 .axis-y > .tick > text {
   transform: translateX(-10px);
-}
-
-.point {
-  fill: steelblue;
-  opacity: 0.7;
 }
 
 /* card style */
