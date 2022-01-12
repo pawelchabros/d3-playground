@@ -38,11 +38,14 @@ $(function() {
             const p1 = projection1([lambda, fi]);
             return [(1 - t) * p0[0] + t * p1[0], (1 - t) * -p0[1] + t * -p1[1]];
           }
-          const projection = setupProjection(() => d3.geoProjection(project), 0.5);
-          const path = d3.geoPath()
-            .projection(projection);
           return function(_) {
             t = _;
+            const projection = setupProjection(() => d3.geoProjection(project), 0.5)
+              .preclip(function(stream) {
+                const clip = Math.PI / 2 + t * Math.PI / 2;
+                return d3.geoClipCircle(clip)(stream);
+              });
+            const path = d3.geoPath().projection(projection);
             return path(d);
           };
         };
