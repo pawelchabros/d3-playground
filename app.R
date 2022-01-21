@@ -1,10 +1,24 @@
 library(shiny)
 library(glue)
 library(purrr)
+library(readr)
 library(sass)
 
 plot_width <- 600
 plot_height <- 400
+
+main <- readr::read_csv("data/data_2021_main_dvs-soti_v1.1.csv")
+
+data <- main %>%
+  dplyr::select(country = Loc1Country, dplyr::contains("ToolsFor")) %>%
+  dplyr::select_if(is.character) %>%
+  dplyr::mutate_at(
+    dplyr::vars(dplyr::contains("ToolsFor")),
+    ~ !is.na(.x)
+  ) %>%
+  dplyr::rename_all(stringr::str_remove, "ToolsForDV_") %>%
+  dplyr::group_by(country) %>%
+  dplyr::summarise_all(mean)
 
 ui <- fluidPage(
   tags$head(
@@ -31,7 +45,7 @@ server <- function(input, output, session) {
       height = plot_height
     ))
   }
-  render_d3_plot(mtcars)
+  render_d3_plot(data)
 }
 
 shinyApp(ui, server)

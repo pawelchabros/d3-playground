@@ -1,8 +1,16 @@
 $(function() {
   Shiny.addCustomMessageHandler(
     "render_d3_plot",
-    function({ data, width, height }) {
-
+    async function({ data, width, height }) {
+      const topo = await d3.json(
+        "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"
+      );
+      topo.features.forEach((d) => {
+        const country = d.properties.name;
+        const countryData = data.find((d) => d.country === country);
+        d.data = countryData;
+      });
+      console.log(topo);
       const selection = {};
 
       function setupProjection(projectionType, scale) {
@@ -16,11 +24,18 @@ $(function() {
       const path = d3.geoPath().projection(projection0);
 
       function rotate() {
+        const tools = ["Excel", "R", "D3", "Tableau", "PowerBI"];
         const timer = d3.timer(function(elapsed) {
-          projection0.rotate([0.04 * elapsed - 120, 0, 0]);
+          const animationTime = 19200;
+          projection0.rotate([0.025 * elapsed - 120, -((1 - (elapsed / animationTime)) * 15), 0]);
           plot.selectAll("path")
-            .attr("d", path);
-          if (elapsed > 3000) {
+            .attr("d", path)
+            .attr("fill", (d) => {
+              const tool = tools[Math.min(tools.length - 1, Math.floor((elapsed / animationTime * tools.length)))];
+              const color = d.data ? d3.interpolateGnBu(d.data[tool]) : "#eaeaea";
+              return color;
+            });
+          if (elapsed > animationTime) {
             timer.stop();
             projectionTransition(selection.graticule);
             projectionTransition(selection.polygon);
@@ -57,29 +72,21 @@ $(function() {
           .attrTween("d", projectionTween(d3.geoOrthographic(), d3.geoEqualEarth()));
       }
 
-      console.log(data);
       const plot = d3.select("svg > .plot");
 
-      d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
-        .then(render);
+      const graticule = d3.geoGraticule()
+        .step([12, 12]);
+      selection.graticule = plot.append("path")
+        .datum(graticule)
+        .attr("class", "graticule");
+      selection.graticule.attr("d", path);
+      selection.polygon = plot.selectAll(".polygon")
+        .data(topo.features)
+        .join("path")
+        .attr("class", "polygon")
+        .attr("fill", (d) => d.data ? d3.interpolateGnBu(d.data["Excel"]) : "#eaeaea");
+      selection.polygon.attr("d", path);
 
-      function render(topo) {
-        const graticule = d3.geoGraticule()
-          .step([12, 12]);
-        selection.graticule = plot.append("path")
-          .datum(graticule)
-          .attr("class", "graticule")
-          .style("fill", "white")
-          .style("stroke", "grey")
-          .style("stroke-width", 0.3);
-        selection.graticule.attr("d", path);
-        selection.polygon = plot.selectAll(".polygon")
-          .data(topo.features)
-          .join("path")
-          .attr("class", "polygon")
-          .attr("fill", "steelblue");
-        selection.polygon.attr("d", path);
-      }
       rotate();
     }
   );

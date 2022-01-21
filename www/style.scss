@@ -1,18 +1,11 @@
-.domain {
-  stroke: transparent;
+.graticule {
+  fill: white;
+  stroke: #cccccc;
+  stroke-width: 0.3;
 }
-.tick > line {
-  opacity: 0.2;
-}
-.tick > text {
-  font-family: Verdana;
-  font-size: 12px;
-}
-.axis-x > .tick > text {
-  transform: translateY(10px);
-}
-.axis-y > .tick > text {
-  transform: translateX(-10px);
+.polygon {
+  opacity: 0.8;
+  transition: fill 1s;
 }
 
 /* card style */
